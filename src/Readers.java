@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,8 +18,8 @@ public class Readers {
      * @throws Exception thrown if array made from line in file is not proper
      *                   length
      */
-    public static List<String> readFile(File f) throws Exception {
-        List<String> lines = new ArrayList<String>();
+    public static Stack<String> readFile(File f) {
+        Stack<String> lines = new Stack<String>();
         try {
             FileInputStream fileInputStream = new FileInputStream(f);
             BufferedReader bufferedReader = new BufferedReader(new
@@ -31,13 +32,13 @@ public class Readers {
                      * to the returned array as single elements */
                     String[] twoRoles = line.split("\\s+");
                     if (twoRoles.length == 2) {
-                        lines.add(twoRoles[0].trim());
-                        lines.add(twoRoles[1].trim());
+                        lines.push(twoRoles[0].trim());
+                        lines.push(twoRoles[1].trim());
                     } else {
                         /* Should not be thrown as format of file was checked in
                          * matches method. */
-                        throw new Exception("Array of Roles not formatted " +
-                                "properly");
+                        System.err.println("twoRoles array imporperly built");
+                        System.exit(1);
                     }
                 } else {
                     fileInputStream.close();
@@ -55,8 +56,15 @@ public class Readers {
         return lines;
     }
 
-    protected static void promptUserFixLine(int lineNum, File file)
-            throws Exception {
+    /**
+     * Prompt the user to fix the file and then re-run the file through the
+     * readFile method.
+     *
+     * @param lineNum with error in file
+     * @param file file being read from
+     * @throws Exception for calling readFile when twoRoles array is mal-formed
+     */
+    protected static void promptUserFixLine(int lineNum, File file) {
         System.out.println("There was an error with line number " + lineNum +
                 ".  Please fix your file and Press any key to continue...");
         try {

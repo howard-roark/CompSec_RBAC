@@ -9,8 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by matthewmcguire on 10/25/14.
@@ -21,30 +20,73 @@ public class HW4Test {
     private File file;
     private File badFile;
 
-    /* Expected list returned from readRoleHierarchy */
-    private List<String> lines = new ArrayList<String>();
+    /*HW4 instance to test */
+    HW4 hw4 = new HW4();
 
+    /* Expected list returned from readFile */
+    private final Stack<String> lines = new Stack<String>();
+
+    /* Expected map returned from readRoleHierarchy */
+    private final Map<String, List<String>> roleMap =
+            new HashMap<String, List<String>>();
+
+    /**
+     * Build expected data structures to compare to actual returns.
+     */
     @Before
     public void setUp() {
         file = new File("/Users/matthewmcguire/Documents/MSUD/" +
-                "Fall_14/CS_3750/HW4/src/roleHierarchyTEST.txt");
+                "Fall_14/CS_3750/HW4/src/roleHierarchy.txt");
         badFile = new File("/Users/matthewmcguire/Documents/MSUD/" +
                 "Fall_14/CS_3750/HW4/src/roleHierarchyBAD.txt");
-        lines.add("R8");
-        lines.add("R6");
-        lines.add("R9");
-        lines.add("R7");
+        lines.push("R8");
+        lines.push("R6");
+        lines.push("R9");
+        lines.push("R7");
+        lines.push("R10");
+        lines.push("R7");
+        lines.push("R4");
+        lines.push("R2");
+        lines.push("R5");
+        lines.push("R2");
+        lines.push("R6");
+        lines.push("R2");
+        lines.push("R7");
+        lines.push("R3");
+        lines.push("R2");
+        lines.push("R1");
+        lines.push("R3");
+        lines.push("R1");
+
+        String[] l = new String[]{"R3", "R2"};
+        roleMap.put("R1", Arrays.asList(l));
+        l = new String[]{"R7"};
+        roleMap.put("R3", Arrays.asList(l));
+        l = new String[]{"R6", "R5", "R4"};
+        roleMap.put("R2", Arrays.asList(l));
+        l = new String[]{"R10", "R9"};
+        roleMap.put("R7", Arrays.asList(l));
+        l = new String[]{"R8"};
+        roleMap.put("R6", Arrays.asList(l));
     }
 
+    /**
+     * Ensure the file is being read in properly.
+     * (Having problem mocking the user interaction for bad files.)
+     *
+     * @throws Exception
+     */
     @Test
-    public void testReadRoleHierarchy() throws Exception {
+    public void testFile() throws Exception {
         assertEquals(lines, Readers.readFile(file));
     }
 
+    /**
+     * Ensure the map created in readRoleHierarchy is correct
+     */
     @Test
-    public void testBadFile() throws Exception {
-        Readers reader = mock(Readers.class);
-        when(reader.readFile(badFile));
+    public void testReadRoleHierarchy() {
+        assertEquals(roleMap, hw4.readRoleHierarchy(file));
     }
 
     /**
