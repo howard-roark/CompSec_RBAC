@@ -1,14 +1,10 @@
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -28,7 +24,7 @@ public class HW4Test {
 
     /* Expected map returned from readRoleHierarchy */
     private final Map<String, List<String>> roleMap =
-            new HashMap<String, List<String>>();
+            new TreeMap<String, List<String>>();
 
     /**
      * Build expected data structures to compare to actual returns.
@@ -78,7 +74,7 @@ public class HW4Test {
      */
     @Test
     public void testFile() throws Exception {
-        assertEquals(lines, Readers.readFile(file));
+        assertEquals(lines, Readers.readRoleHierarchyFile(file));
     }
 
     /**

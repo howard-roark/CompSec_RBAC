@@ -18,7 +18,7 @@ public class Readers {
      * @throws Exception thrown if array made from line in file is not proper
      *                   length
      */
-    public static Stack<String> readFile(File f) {
+    public static Stack<String> readRoleHierarchyFile(File f) {
         Stack<String> lines = new Stack<String>();
         try {
             FileInputStream fileInputStream = new FileInputStream(f);
@@ -37,7 +37,7 @@ public class Readers {
                     } else {
                         /* Should not be thrown as format of file was checked in
                          * matches method. */
-                        System.err.println("twoRoles array imporperly built");
+                        System.err.println("<twoRoles> array improperly built");
                         System.exit(1);
                     }
                 } else {
@@ -64,14 +64,14 @@ public class Readers {
      * @param file file being read from
      * @throws Exception for calling readFile when twoRoles array is mal-formed
      */
-    protected static void promptUserFixLine(int lineNum, File file) {
+    private static void promptUserFixLine(int lineNum, File file) {
         System.out.println("There was an error with line number " + lineNum +
                 ".  Please fix your file and Press any key to continue...");
         try {
             BufferedReader br = new BufferedReader(new
                     InputStreamReader(System.in));
             if (br.readLine() != null) {
-                Readers.readFile(file);
+                Readers.readRoleHierarchyFile(file);
             }
         } catch (IOException ioe) {
             HW4.p("Error reading input from user: " + ioe);

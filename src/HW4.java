@@ -14,9 +14,9 @@ public class HW4 {
      * with the error.
      */
     public Map<String, List<String>> readRoleHierarchy(File file) {
-        Stack<String> roleStack = Readers.readFile(file);
+        Stack<String> roleStack = Readers.readRoleHierarchyFile(file);
         Map<String, List<String>> roleMap =
-                new HashMap<String, List<String>>();
+                new TreeMap<String, List<String>>();
         List<String> ascendants;
         while (roleStack.size() >= 2) {
             String descendant = roleStack.pop();
@@ -35,7 +35,25 @@ public class HW4 {
                 roleMap.putIfAbsent(descendant, ascendants);
             }
         }
+        printRoleMap(roleMap);
         return roleMap;
+    }
+
+    /**
+     * Print the role map to the console for the user to read.
+     *
+     * @param roleMap
+     */
+    private void printRoleMap(Map<String, List<String>> roleMap) {
+        for (String descendant : roleMap.keySet()) {
+            String subRoles = "";
+            for (String ascendant : roleMap.get(descendant)) {
+                subRoles = subRoles + ascendant + ", ";
+            }
+            //Remove last comma before printing
+            subRoles = subRoles.substring(0, subRoles.length() - 2);
+            HW4.p(descendant + " --> " + subRoles);
+        }
     }
 
     /**
