@@ -1,7 +1,5 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +16,7 @@ public class Readers {
      * @throws Exception thrown if array made from line in file is not proper
      *                   length
      */
-    public static Stack<String> readRoleHierarchyFile(File f) {
+    protected static Stack<String> readRoleHierarchyFile(File f) {
         Stack<String> lines = new Stack<String>();
         try {
             FileInputStream fileInputStream = new FileInputStream(f);
@@ -78,6 +76,55 @@ public class Readers {
         }
     }
 
+    protected static Map<String, Set<String>> readResourceObjectsFile(File file) {
+        //Build empty map to fill in logic below
+        Map<String, Set<String>> objectsMap =
+                new TreeMap<String, Set<String>>();
+        String f = "File", p = "Process", d = "Disk";
+        objectsMap.put(f, new LinkedHashSet<String>());
+        objectsMap.put(p, new LinkedHashSet<String>());
+        objectsMap.put(d, new LinkedHashSet<String>());
+
+        try {
+            FileInputStream fileInputStream = new FileInputStream(f);
+            BufferedReader bufferedReader = new BufferedReader(new
+                    InputStreamReader(fileInputStream));
+
+            String line = bufferedReader.readLine();
+            if (line != null) {
+                while (!line.equals("")) {
+                    String object =
+                            getTextByPattern("^([FPD]{1}[0-9]+)", line);
+                    String key = "";
+                    char firstChar = Character.toUpperCase(object.charAt(0));
+                    switch (firstChar) {
+                        case 'F':
+                            key = f;
+                            break;
+                        case 'P':
+                            key = p;
+                            break;
+                        case 'D':
+                            key = d;
+                            break;
+                        default:
+                            System.err.println("Unknown Object Found in File");
+                            System.exit(1);
+                    }
+                    Set<String> objectsSet = objectsMap.get(key);
+                    objectsSet.add(object);
+                    objectsMap.replace(key, objectsSet);
+
+                    line = line.substring(2, line.length() - 1);
+                }
+            }
+        } catch (IOException ioe) {
+            System.err.println("Error reading resourceObjects.txt: " + ioe);
+            System.exit(1);
+        }
+        return objectsMap;
+    }
+
     /**
      * Will determine if the line in the file is valid to be used in the HW4
      * class.
@@ -89,5 +136,21 @@ public class Readers {
     protected static boolean matches(String regex, String line) {
         Pattern p = Pattern.compile(regex);
         return p.matches(regex, line);
+    }
+
+    /** Return a string based on the regex and string passed in.
+     *
+     * @param regex
+     * @param string
+     * @return
+     */
+    protected static String getTextByPattern(String regex, String string) {
+        String found = "";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(string);
+        if ((m.find()) && (m.groupCount() > 0)) {
+            found = m.group(1);
+        }
+        return found;
     }
 }

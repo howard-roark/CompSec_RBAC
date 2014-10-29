@@ -10,8 +10,7 @@ public class HW4 {
      * Problem 2 on the Homework Assignment.
      *
      * @param file
-     * @return -1 for valid file, any other int for the line number of the file
-     * with the error.
+     * @return roleHierarchy in map data structure
      */
     public Map<String, List<String>> readRoleHierarchy(File file) {
         Stack<String> roleStack = Readers.readRoleHierarchyFile(file);
@@ -54,6 +53,12 @@ public class HW4 {
             subRoles = subRoles.substring(0, subRoles.length() - 2);
             HW4.p(descendant + " --> " + subRoles);
         }
+    }
+
+    protected Map<String, Set<String>> readResourceObjects(File file) {
+        Map<String, Set<String>> objectsMap =
+                Readers.readResourceObjectsFile(file);
+        return objectsMap;
     }
 
     /**

@@ -26,6 +26,13 @@ public class HW4Test {
     private final Map<String, List<String>> roleMap =
             new TreeMap<String, List<String>>();
 
+    /* Expected map to be returned for readResourceObjects */
+    private final Map<String, Set<String>> objectsMap =
+            new TreeMap<String, Set<String>>();
+
+    /* Set to add objects to for map above */
+    private final Set<String> objectsSet = new LinkedHashSet<String>();
+
     /**
      * Build expected data structures to compare to actual returns.
      */
@@ -64,6 +71,22 @@ public class HW4Test {
         roleMap.put("R7", Arrays.asList(l));
         l = new String[]{"R8"};
         roleMap.put("R6", Arrays.asList(l));
+
+        objectsSet.add("F1");
+        objectsSet.add("F2");
+        objectsSet.add("F3");
+        objectsSet.add("F4");
+        objectsMap.put("File", objectsSet);
+
+        objectsSet.clear();
+        objectsSet.add("P1");
+        objectsSet.add("P2");
+        objectsMap.put("Process", objectsSet);
+
+        objectsSet.clear();
+        objectsSet.add("D1");
+        objectsSet.add("D2");
+        objectsMap.put("Disk", objectsSet);
     }
 
     /**
@@ -99,6 +122,21 @@ public class HW4Test {
                 "R5\tR5\\s"));
     }
 
+    @Test
+    public void testGetTextByPattern() {
+        assertEquals("F1", Readers.getTextByPattern("^[\\s]*([FPD]{1}[0-9]+).*",
+                "F1     F2  F4  D1"));
+        assertEquals("D4", Readers.getTextByPattern("^[\\s]*([FPD]{1}[0-9]+).*",
+                "       D4 D6D9"));
+    }
+
+
+    @Test
+    public void testReadResourceObjectsFile() {
+        assertEquals(objectsMap,
+                Readers.readResourceObjectsFile(new
+                        File("/Users/matthewmcguire/Documents/MSUD/Fall_14/CS_3750/HW4/src/resourceObjects.txt")));
+    }
     @After
     public void breakDown() {
 
