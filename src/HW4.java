@@ -62,6 +62,24 @@ public class HW4 {
     }
 
     /**
+     * Take in the built maps for roleHierarchy and objectsResources and print
+     * the matrix appropriately.
+     *
+     * @param rolesMap
+     * @param objectsMap
+     */
+    protected void printRoleObjectMatrix(Map<String, List<String>> rolesMap,
+                                         Map<String, Set<String>> objectsMap) {
+        List<String> allRoles = new LinkedList<String>();
+        for (String rolesKey : rolesMap.keySet()) {
+            allRoles.add(rolesKey);
+            LinkedList<String> ascendants = (LinkedList) rolesMap.get(rolesKey);
+            for (int i = ascendants.size() - 1 ; i > 0 ; i--) {
+                allRoles.add(ascendants.removeLast());
+            }
+        }
+    }
+    /**
      * Method to avoid using System.out for every call to print to console.
      *
      * @param item The token that was found

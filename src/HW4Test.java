@@ -14,7 +14,6 @@ public class HW4Test {
 
     /* Role Hierarchy test file to make sure file is read properly */
     private File file;
-    private File badFile;
 
     /*HW4 instance to test */
     HW4 hw4 = new HW4();
@@ -30,8 +29,10 @@ public class HW4Test {
     private final Map<String, Set<String>> objectsMap =
             new TreeMap<String, Set<String>>();
 
-    /* Set to add objects to for map above */
-    private final Set<String> objectsSet = new LinkedHashSet<String>();
+    /* Sets to add objects to for map above */
+    private final Set<String> objectsSetF = new LinkedHashSet<String>();
+    private final Set<String> objectsSetP = new LinkedHashSet<String>();
+    private final Set<String> objectsSetD = new LinkedHashSet<String>();
 
     /**
      * Build expected data structures to compare to actual returns.
@@ -40,8 +41,6 @@ public class HW4Test {
     public void setUp() {
         file = new File("/Users/matthewmcguire/Documents/MSUD/" +
                 "Fall_14/CS_3750/HW4/src/roleHierarchy.txt");
-        badFile = new File("/Users/matthewmcguire/Documents/MSUD/" +
-                "Fall_14/CS_3750/HW4/src/roleHierarchyBAD.txt");
         lines.push("R8");
         lines.push("R6");
         lines.push("R9");
@@ -72,21 +71,22 @@ public class HW4Test {
         l = new String[]{"R8"};
         roleMap.put("R6", Arrays.asList(l));
 
-        objectsSet.add("F1");
-        objectsSet.add("F2");
-        objectsSet.add("F3");
-        objectsSet.add("F4");
-        objectsMap.put("File", objectsSet);
+        objectsSetF.add("F1");
+        objectsSetF.add("F2");
+        objectsSetF.add("F3");
+        objectsSetF.add("F4");
+        objectsMap.put("File", objectsSetF);
 
-        objectsSet.clear();
-        objectsSet.add("P1");
-        objectsSet.add("P2");
-        objectsMap.put("Process", objectsSet);
+        objectsSetP.clear();
+        objectsSetP.add("P1");
+        objectsSetP.add("P2");
+        objectsSetP.add("P3");
+        objectsMap.put("Process", objectsSetP);
 
-        objectsSet.clear();
-        objectsSet.add("D1");
-        objectsSet.add("D2");
-        objectsMap.put("Disk", objectsSet);
+        objectsSetD.clear();
+        objectsSetD.add("D1");
+        objectsSetD.add("D2");
+        objectsMap.put("Disk", objectsSetD);
     }
 
     /**
@@ -134,8 +134,7 @@ public class HW4Test {
     @Test
     public void testReadResourceObjectsFile() {
         assertEquals(objectsMap,
-                Readers.readResourceObjectsFile(new
-                        File("/Users/matthewmcguire/Documents/MSUD/Fall_14/CS_3750/HW4/src/resourceObjects.txt")));
+                Readers.readResourceObjectsFile(new File("/Users/matthewmcguire/Documents/MSUD/Fall_14/CS_3750/HW4/src/resourceObjects.txt")));
     }
     @After
     public void breakDown() {

@@ -86,15 +86,15 @@ public class Readers {
         objectsMap.put(d, new LinkedHashSet<String>());
 
         try {
-            FileInputStream fileInputStream = new FileInputStream(f);
+            FileInputStream fileInputStream = new FileInputStream(file);
             BufferedReader bufferedReader = new BufferedReader(new
                     InputStreamReader(fileInputStream));
 
             String line = bufferedReader.readLine();
             if (line != null) {
-                while (!line.equals("")) {
+                while (line.length() >= 2) {
                     String object =
-                            getTextByPattern("^([FPD]{1}[0-9]+)", line);
+                            getTextByPattern("^[\\s]*([FPD]{1}[0-9]+).*", line);
                     String key = "";
                     char firstChar = Character.toUpperCase(object.charAt(0));
                     switch (firstChar) {
@@ -114,10 +114,17 @@ public class Readers {
                     Set<String> objectsSet = objectsMap.get(key);
                     objectsSet.add(object);
                     objectsMap.replace(key, objectsSet);
+                    if (line.length() > 2) {
+                        line = line.substring(2, line.length());
+                    } else {
+                        break;
+                    }
 
-                    line = line.substring(2, line.length() - 1);
                 }
             }
+            /*Close the stream and reader */
+            fileInputStream.close();
+            bufferedReader.close();
         } catch (IOException ioe) {
             System.err.println("Error reading resourceObjects.txt: " + ioe);
             System.exit(1);
