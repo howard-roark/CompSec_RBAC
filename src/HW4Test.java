@@ -14,6 +14,7 @@ public class HW4Test {
 
     /* Role Hierarchy test file to make sure file is read properly */
     private File file;
+    String workingDirectory;
 
     /*HW4 instance to test */
     HW4 hw4 = new HW4();
@@ -39,8 +40,8 @@ public class HW4Test {
      */
     @Before
     public void setUp() {
-        file = new File("/Users/matthewmcguire/Documents/MSUD/" +
-                "Fall_14/CS_3750/HW4/src/roleHierarchy.txt");
+        workingDirectory = System.getProperty("user.dir") + "/src/";
+        file = new File(workingDirectory + "roleHierarchy.txt");
         lines.push("R8");
         lines.push("R6");
         lines.push("R9");
@@ -60,13 +61,13 @@ public class HW4Test {
         lines.push("R3");
         lines.push("R1");
 
-        String[] l = new String[]{"R3", "R2"};
+        String[] l = new String[]{"R2", "R3"};
         roleMap.put("R1", Arrays.asList(l));
         l = new String[]{"R7"};
         roleMap.put("R3", Arrays.asList(l));
-        l = new String[]{"R6", "R5", "R4"};
+        l = new String[]{"R4", "R5", "R6"};
         roleMap.put("R2", Arrays.asList(l));
-        l = new String[]{"R10", "R9"};
+        l = new String[]{"R9", "R10"};
         roleMap.put("R7", Arrays.asList(l));
         l = new String[]{"R8"};
         roleMap.put("R6", Arrays.asList(l));
@@ -130,12 +131,37 @@ public class HW4Test {
                 "       D4 D6D9"));
     }
 
-
+    /**
+     * Ensure that resourceObjects.txt is being read in properly.
+     */
     @Test
     public void testReadResourceObjectsFile() {
         assertEquals(objectsMap,
-                Readers.readResourceObjectsFile(new File("/Users/matthewmcguire/Documents/MSUD/Fall_14/CS_3750/HW4/src/resourceObjects.txt")));
+                Readers.readResourceObjectsFile(new File(workingDirectory +
+                        "resourceObjects.txt")));
     }
+
+    /**
+     * Ensure the is setup to be printed properly.
+     */
+    @Test
+    public void testPrintRoleObjectMatrix() {
+        Map<String, List<String>> rolesMap = hw4.readRoleHierarchy(file);
+        List<String> allRoles = new LinkedList<String>();
+        for (String rolesKey : rolesMap.keySet()) {
+            allRoles.add(rolesKey);
+            List<String> ascendants = rolesMap.get(rolesKey);
+            for (String ascendant : ascendants) {
+                if (!allRoles.contains(ascendant)) {
+                    allRoles.add(ascendant);
+                }
+            }
+            Collections.sort(allRoles);
+        }
+        assertNotNull(allRoles);
+    }
+
+
     @After
     public void breakDown() {
 

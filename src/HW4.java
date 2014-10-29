@@ -46,7 +46,9 @@ public class HW4 {
     private void printRoleMap(Map<String, List<String>> roleMap) {
         for (String descendant : roleMap.keySet()) {
             String subRoles = "";
-            for (String ascendant : roleMap.get(descendant)) {
+            List<String> ascendants = roleMap.get(descendant);
+            Collections.sort(ascendants, new NaturalOrderComparator());
+            for (String ascendant : ascendants) {
                 subRoles = subRoles + ascendant + ", ";
             }
             //Remove last comma before printing
@@ -74,11 +76,18 @@ public class HW4 {
         for (String rolesKey : rolesMap.keySet()) {
             allRoles.add(rolesKey);
             LinkedList<String> ascendants = (LinkedList) rolesMap.get(rolesKey);
-            for (int i = ascendants.size() - 1 ; i > 0 ; i--) {
-                allRoles.add(ascendants.removeLast());
+            for (String ascendant : ascendants) {
+                if (!allRoles.contains(ascendant)) {
+                    allRoles.add(ascendant);
+                }
             }
         }
+        Collections.sort(allRoles, new NaturalOrderComparator());
+
+        String[][] roleObjectMatrix =
+                new String[allRoles.size()][];
     }
+
     /**
      * Method to avoid using System.out for every call to print to console.
      *
