@@ -12,9 +12,12 @@ import java.util.*;
  */
 public class HW4Test {
 
-    /* Role Hierarchy test file to make sure file is read properly */
-    private File file;
+    /* Role Hierarchy test roleFile to make sure roleFile is read properly */
+    private File roleFile;
     String workingDirectory;
+
+    /* File for resource objects */
+    File objsFile;
 
     /*HW4 instance to test */
     HW4 hw4 = new HW4();
@@ -35,13 +38,19 @@ public class HW4Test {
     private final Set<String> objectsSetP = new LinkedHashSet<String>();
     private final Set<String> objectsSetD = new LinkedHashSet<String>();
 
+    /* Strings for Keys of objects map used to build matrix */
+    private final String FILE = "File";
+    private final String PROCESS = "Process";
+    private final String DISK = "Disk";
+
     /**
      * Build expected data structures to compare to actual returns.
      */
     @Before
     public void setUp() {
         workingDirectory = System.getProperty("user.dir") + "/src/";
-        file = new File(workingDirectory + "roleHierarchy.txt");
+        roleFile = new File(workingDirectory + "roleHierarchy.txt");
+        objsFile = new File(workingDirectory + "resourceObjects.txt");
         lines.push("R8");
         lines.push("R6");
         lines.push("R9");
@@ -91,14 +100,14 @@ public class HW4Test {
     }
 
     /**
-     * Ensure the file is being read in properly.
-     * (Having problem mocking the user interaction for bad files.)
+     * Ensure the roleFile is being read in properly.
+     * (Having problem mocking the user interaction for bad roleFiles.)
      *
      * @throws Exception
      */
     @Test
     public void testFile() throws Exception {
-        assertEquals(lines, Readers.readRoleHierarchyFile(file));
+        assertEquals(lines, Readers.readRoleHierarchyFile(roleFile));
     }
 
     /**
@@ -106,12 +115,12 @@ public class HW4Test {
      */
     @Test
     public void testReadRoleHierarchy() {
-        assertEquals(roleMap, hw4.readRoleHierarchy(file));
+        assertEquals(roleMap, hw4.readRoleHierarchy(roleFile));
     }
 
     /**
      * Ensure that the matches method in Readers is testing the lines read in
-     * from the roleHierarchy files properly.
+     * from the roleHierarchy roleFiles properly.
      */
     @Test
     public void testMatches() {
@@ -137,28 +146,109 @@ public class HW4Test {
     @Test
     public void testReadResourceObjectsFile() {
         assertEquals(objectsMap,
-                Readers.readResourceObjectsFile(new File(workingDirectory +
-                        "resourceObjects.txt")));
+                Readers.readResourceObjectsFile(objsFile));
     }
 
     /**
-     * Ensure the is setup to be printed properly.
+     * Ensure the full matrix is setup to be build properly.
      */
     @Test
-    public void testPrintRoleObjectMatrix() {
-        Map<String, List<String>> rolesMap = hw4.readRoleHierarchy(file);
-        List<String> allRoles = new LinkedList<String>();
+    public void buildRoleObjectMatrix() {
+        Map<String, List<String>> rolesMap = hw4.readRoleHierarchy(roleFile);
+        Map<String, Set<String>> objectsMap = hw4.readResourceObjects(objsFile);
+
+        //Pull all roles from rolesMap Map
+        List<String> allRoles = new ArrayList<String>();
         for (String rolesKey : rolesMap.keySet()) {
-            allRoles.add(rolesKey);
+            if (!allRoles.contains(rolesKey)) {
+                allRoles.add(rolesKey);
+            }
             List<String> ascendants = rolesMap.get(rolesKey);
             for (String ascendant : ascendants) {
                 if (!allRoles.contains(ascendant)) {
                     allRoles.add(ascendant);
                 }
             }
-            Collections.sort(allRoles);
         }
-        assertNotNull(allRoles);
+        Collections.sort(allRoles, new NaturalOrderComparator());
+
+        //Pull all objects from
+        List<String> allObjects = new ArrayList<String>();
+        if (objectsMap.get(FILE).size() > 0) {
+            allObjects.addAll(objectsMap.get(FILE));
+        }
+        if (objectsMap.get(PROCESS).size() > 0) {
+            allObjects.addAll(objectsMap.get(PROCESS));
+        }
+        if (objectsMap.get(DISK).size() > 0) {
+            allObjects.addAll(objectsMap.get(DISK));
+        }
+        Collections.sort(allObjects, new NaturalOrderComparator());
+
+        //Determine how many rows and columns needed for matrix
+        int rowsNeeded = allRoles.size() + 1;
+        int colsNeeded = allRoles.size() + allObjects.size() + 1;
+        String[][] roleObjectMatrix = new String[rowsNeeded][colsNeeded];
+
+        boolean rowsDone = false;
+        int i = 1, j = 1;
+        while ((i < rowsNeeded) && (j < colsNeeded)) {
+            //Fill in row titles (Roles)
+            if (i < rowsNeeded) {
+                roleObjectMatrix[i][0] = allRoles.get(i - 1);
+                i++;
+
+                //Rows done start building the columns
+                if (i == rowsNeeded - 1) {
+                    rowsDone = true;
+                }
+            }
+
+            //Fill in column headers (Roles and Objects)
+            if (rowsDone) {
+                if (j < colsNeeded) {
+                    if (j <= allRoles.size()) {
+                        roleObjectMatrix[0][j] = allRoles.get(j - 1);
+                    }
+                    roleObjectMatrix[0][j + allRoles.size()] =
+                            allObjects.get(j - 1);
+                    j++;
+                }
+            }
+        }
+        //Build matrix to test with
+        String[][] testRoleObjectMatrix = new String[rowsNeeded][colsNeeded];
+        testRoleObjectMatrix[1][0] = "R1";
+        testRoleObjectMatrix[2][0] = "R2";
+        testRoleObjectMatrix[3][0] = "R3";
+        testRoleObjectMatrix[4][0] = "R4";
+        testRoleObjectMatrix[5][0] = "R5";
+        testRoleObjectMatrix[6][0] = "R6";
+        testRoleObjectMatrix[7][0] = "R7";
+        testRoleObjectMatrix[8][0] = "R8";
+        testRoleObjectMatrix[9][0] = "R9";
+        testRoleObjectMatrix[10][0] = "R10";
+
+        testRoleObjectMatrix[0][1] = "R1";
+        testRoleObjectMatrix[0][2] = "R2";
+        testRoleObjectMatrix[0][3] = "R3";
+        testRoleObjectMatrix[0][4] = "R4";
+        testRoleObjectMatrix[0][5] = "R5";
+        testRoleObjectMatrix[0][6] = "R6";
+        testRoleObjectMatrix[0][7] = "R7";
+        testRoleObjectMatrix[0][8] = "R8";
+        testRoleObjectMatrix[0][9] = "R9";
+        testRoleObjectMatrix[0][10] = "R10";
+        testRoleObjectMatrix[0][11] = "F1";
+        testRoleObjectMatrix[0][12] = "F2";
+        testRoleObjectMatrix[0][13] = "F3";
+        testRoleObjectMatrix[0][14] = "F4";
+        testRoleObjectMatrix[0][15] = "P1";
+        testRoleObjectMatrix[0][16] = "P2";
+        testRoleObjectMatrix[0][17] = "P3";
+        testRoleObjectMatrix[0][18] = "D1";
+        testRoleObjectMatrix[0][19] = "D2";
+        assertEquals(roleObjectMatrix, testRoleObjectMatrix);
     }
 
 

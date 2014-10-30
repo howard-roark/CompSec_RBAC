@@ -5,6 +5,10 @@ import java.util.*;
  * Created by matthewmcguire on 10/25/14.
  */
 public class HW4 {
+    /* Keys for objectsMap passed in from Readers */
+    private final String FILE = "File";
+    private final String PROCESS = "Process";
+    private final String DISK = "Disk";
 
     /**
      * Problem 2 on the Homework Assignment.
@@ -70,12 +74,15 @@ public class HW4 {
      * @param rolesMap
      * @param objectsMap
      */
-    protected void printRoleObjectMatrix(Map<String, List<String>> rolesMap,
+    protected void buildRoleObjectMatrix(Map<String, List<String>> rolesMap,
                                          Map<String, Set<String>> objectsMap) {
-        List<String> allRoles = new LinkedList<String>();
+        //Pull all roles from rolesMap Map
+        List<String> allRoles = new ArrayList<String>();
         for (String rolesKey : rolesMap.keySet()) {
-            allRoles.add(rolesKey);
-            LinkedList<String> ascendants = (LinkedList) rolesMap.get(rolesKey);
+            if (!allRoles.contains(rolesKey)) {
+                allRoles.add(rolesKey);
+            }
+            List<String> ascendants = rolesMap.get(rolesKey);
             for (String ascendant : ascendants) {
                 if (!allRoles.contains(ascendant)) {
                     allRoles.add(ascendant);
@@ -84,8 +91,58 @@ public class HW4 {
         }
         Collections.sort(allRoles, new NaturalOrderComparator());
 
-        String[][] roleObjectMatrix =
-                new String[allRoles.size()][];
+        //Pull all objects from
+        List<String> allObjects = new ArrayList<String>();
+        if (objectsMap.get(FILE).size() > 0) {
+            allObjects.addAll(objectsMap.get(FILE));
+        }
+        if (objectsMap.get(PROCESS).size() > 0) {
+            allObjects.addAll(objectsMap.get(PROCESS));
+        }
+        if (objectsMap.get(DISK).size() > 0) {
+            allObjects.addAll(objectsMap.get(DISK));
+        }
+        Collections.sort(allObjects, new NaturalOrderComparator());
+
+        //Determine how many rows and columns needed for matrix
+        int rowsNeeded = allRoles.size() + 1;
+        int colsNeeded = allRoles.size() + allObjects.size() + 1;
+        String[][] roleObjectMatrix = new String[rowsNeeded][colsNeeded];
+
+        boolean rowsDone = false;
+        int i = 1, j = 1;
+        while ((i < rowsNeeded) && (j < colsNeeded)) {
+            //Fill in row titles (Roles)
+            if (i < rowsNeeded) {
+                roleObjectMatrix[i][0] = allRoles.get(i - 1);
+                i++;
+            } else if (i == rowsNeeded) {
+                rowsDone = true;
+            }
+
+            //Fill in column headers (Roles and Objects)
+            if (rowsDone) {
+                if (j <= colsNeeded) {
+                    if (j < allRoles.size()) {
+                        roleObjectMatrix[0][j] = allRoles.get(j - 1);
+                    }
+                    roleObjectMatrix[0][j + allRoles.size() - 1] =
+                            allObjects.get(j - 1);
+                    j++;
+                } else {
+                    break;
+                }
+            }
+        }
+        printRoleObjectMatrix(roleObjectMatrix);
+    }
+
+
+    protected void printRoleObjectMatrix(String[][] roleObjectMatrix) {
+        int hMatrix = roleObjectMatrix.length;
+        int wMatrix = roleObjectMatrix[0].length;
+        p("Height: " + hMatrix);
+        p("Width: " + wMatrix);
     }
 
     /**
