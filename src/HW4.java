@@ -38,7 +38,6 @@ public class HW4 {
                 roleMap.putIfAbsent(descendant, ascendants);
             }
         }
-        printRoleMap(roleMap);
         return roleMap;
     }
 
@@ -57,7 +56,7 @@ public class HW4 {
             }
             //Remove last comma before printing
             subRoles = subRoles.substring(0, subRoles.length() - 2);
-            HW4.p(descendant + " --> " + subRoles);
+            HW4.pLn(descendant + " --> " + subRoles);
         }
     }
 
@@ -74,8 +73,8 @@ public class HW4 {
      * @param rolesMap
      * @param objectsMap
      */
-    protected void buildRoleObjectMatrix(Map<String, List<String>> rolesMap,
-                                         Map<String, Set<String>> objectsMap) {
+    protected String[][] buildRoleObjectMatrix(Map<String, List<String>> rolesMap,
+                                               Map<String, Set<String>> objectsMap) {
         //Pull all roles from rolesMap Map
         List<String> allRoles = new ArrayList<String>();
         for (String rolesKey : rolesMap.keySet()) {
@@ -123,15 +122,28 @@ public class HW4 {
             }
             i++;
         }
-        printRoleObjectMatrix(roleObjectMatrix);
+        return roleObjectMatrix;
     }
 
-
+    /**
+     * Print the empty Role Object matrix.  This is easier for me to read and
+     * understand when the columns are not broken up.
+     *
+     * @param roleObjectMatrix
+     */
     protected void printRoleObjectMatrix(String[][] roleObjectMatrix) {
         int hMatrix = roleObjectMatrix.length;
         int wMatrix = roleObjectMatrix[0].length;
-        p("Height: " + hMatrix);
-        p("Width: " + wMatrix);
+        for (int i = 0; i < hMatrix; i++) {
+            for (int j = 0; j < wMatrix; j++) {
+                if (roleObjectMatrix[i][j] != null) {
+                    p(roleObjectMatrix[i][j] + "\t\t");
+                } else {
+                    p(roleObjectMatrix[i][j] + "\t");
+                }
+            }
+            pLn("");
+        }
     }
 
     /**
@@ -139,7 +151,27 @@ public class HW4 {
      *
      * @param item The token that was found
      */
-    protected static void p(Object item) {
+    protected static void pLn(Object item) {
         System.out.println(item);
+    }
+
+    protected static void p(Object item) {
+        System.out.print(item);
+    }
+
+    public static void main(String[] args) {
+        HW4 hw4 = new HW4();
+        String workingDirectory = System.getProperty("user.dir");
+        File roleFile = new File(workingDirectory + "/Files/roleHierarchy.txt");
+        File objectFile = new File(workingDirectory + "/Files/resourceObjects.txt");
+
+        pLn("Problem 2:\n");
+        hw4.printRoleMap(hw4.readRoleHierarchy(roleFile));
+
+        pLn("\nProblem 3:\n");
+        hw4.printRoleObjectMatrix(
+                hw4.buildRoleObjectMatrix(
+                        hw4.readRoleHierarchy(roleFile),
+                        hw4.readResourceObjects(objectFile)));
     }
 }

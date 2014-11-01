@@ -49,8 +49,8 @@ public class HW4Test {
     @Before
     public void setUp() {
         workingDirectory = System.getProperty("user.dir") + "/src/";
-        roleFile = new File(workingDirectory + "roleHierarchy.txt");
-        objsFile = new File(workingDirectory + "resourceObjects.txt");
+        roleFile = new File(workingDirectory + "Files/roleHierarchy.txt");
+        objsFile = new File(workingDirectory + "Files/resourceObjects.txt");
         lines.push("R8");
         lines.push("R6");
         lines.push("R9");
