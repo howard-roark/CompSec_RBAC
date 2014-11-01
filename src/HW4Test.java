@@ -241,6 +241,14 @@ public class HW4Test {
     }
 
 
+    @Test
+    public void testAccessRightsCompareMethod() {
+        for (AccessRights right : AccessRights.values()) {
+            HW4.pLn(right.getAccessRightValue());
+        }
+        assertEquals(true, AccessRights.compareAccessRights("seek"));
+    }
+
     @After
     public void breakDown() {
 

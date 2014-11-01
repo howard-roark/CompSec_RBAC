@@ -1,0 +1,4 @@
+R6      write*      F3
+R2      seek        D1
+R10     stop        P1
+R7      seek*       D2

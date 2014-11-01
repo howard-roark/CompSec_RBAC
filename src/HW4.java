@@ -137,13 +137,45 @@ public class HW4 {
         for (int i = 0; i < hMatrix; i++) {
             for (int j = 0; j < wMatrix; j++) {
                 if (roleObjectMatrix[i][j] != null) {
-                    p(roleObjectMatrix[i][j] + "\t\t");
+                    p(roleObjectMatrix[i][j] + "\t\t\t");
                 } else {
-                    p(roleObjectMatrix[i][j] + "\t");
+                    roleObjectMatrix[i][j] = "";
+                    p(roleObjectMatrix[i][j] + "\t\t\t");
                 }
             }
             pLn("");
         }
+    }
+
+    /**
+     * Grant control rights to
+     * @param accessMatrix
+     */
+    protected void grantControlRights(String[][] accessMatrix) {
+        //Grant all roles to control themselves
+        for (int i = 1; i < accessMatrix.length; i++) {
+            for (int j = 1; j < accessMatrix[0].length; j++) {
+                if (accessMatrix[i][0].equals(accessMatrix[0][j])) {
+                    accessMatrix[i][j] =
+                            AccessRights.CONTROL.getAccessRightValue();
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Grant the permissions from the permissionsToRoles file.
+     *
+     * @param roles
+     * @param accessMatrix
+     * @param permissions
+     */
+    protected void grantPermissions(Map<String, List<String>> roles,
+                                    String[][] accessMatrix,
+                                    File permissions) {
+        grantControlRights(accessMatrix);
+
     }
 
     /**
@@ -162,8 +194,12 @@ public class HW4 {
     public static void main(String[] args) {
         HW4 hw4 = new HW4();
         String workingDirectory = System.getProperty("user.dir");
-        File roleFile = new File(workingDirectory + "/Files/roleHierarchy.txt");
-        File objectFile = new File(workingDirectory + "/Files/resourceObjects.txt");
+        File roleFile = new File(workingDirectory +
+                "/Files/roleHierarchy.txt");
+        File objectFile = new File(workingDirectory +
+                "/Files/resourceObjects.txt");
+        File permissionsFile = new File(workingDirectory +
+                "/Files/permissionsToRoles.txt");
 
         pLn("Problem 2:\n");
         hw4.printRoleMap(hw4.readRoleHierarchy(roleFile));
@@ -173,5 +209,12 @@ public class HW4 {
                 hw4.buildRoleObjectMatrix(
                         hw4.readRoleHierarchy(roleFile),
                         hw4.readResourceObjects(objectFile)));
+
+        pLn("\nProblem 4:\n");
+        hw4.grantPermissions(hw4.readRoleHierarchy(roleFile),
+                hw4.buildRoleObjectMatrix(
+                        hw4.readRoleHierarchy(roleFile),
+                        hw4.readResourceObjects(objectFile)),
+                        permissionsFile);
     }
 }
