@@ -183,39 +183,28 @@ public class HW4Test {
         if (objectsMap.get(DISK).size() > 0) {
             allObjects.addAll(objectsMap.get(DISK));
         }
-        Collections.sort(allObjects, new NaturalOrderComparator());
 
         //Determine how many rows and columns needed for matrix
         int rowsNeeded = allRoles.size() + 1;
         int colsNeeded = allRoles.size() + allObjects.size() + 1;
         String[][] roleObjectMatrix = new String[rowsNeeded][colsNeeded];
 
-        boolean rowsDone = false;
-        int i = 1, j = 1;
-        while ((i < rowsNeeded) && (j < colsNeeded)) {
+        int i = 1, j = 0;
+        while (i < colsNeeded) {
             //Fill in row titles (Roles)
             if (i < rowsNeeded) {
                 roleObjectMatrix[i][0] = allRoles.get(i - 1);
-                i++;
-
-                //Rows done start building the columns
-                if (i == rowsNeeded - 1) {
-                    rowsDone = true;
-                }
+                roleObjectMatrix[0][i] = allRoles.get(i - 1);
             }
 
-            //Fill in column headers (Roles and Objects)
-            if (rowsDone) {
-                if (j < colsNeeded) {
-                    if (j <= allRoles.size()) {
-                        roleObjectMatrix[0][j] = allRoles.get(j - 1);
-                    }
-                    roleObjectMatrix[0][j + allRoles.size()] =
-                            allObjects.get(j - 1);
-                    j++;
-                }
+            //Rows done start building the columns
+            if (i >= rowsNeeded) {
+                roleObjectMatrix[0][i] = allObjects.get(j);
+                j++;
             }
+            i++;
         }
+
         //Build matrix to test with
         String[][] testRoleObjectMatrix = new String[rowsNeeded][colsNeeded];
         testRoleObjectMatrix[1][0] = "R1";
@@ -248,7 +237,7 @@ public class HW4Test {
         testRoleObjectMatrix[0][17] = "P3";
         testRoleObjectMatrix[0][18] = "D1";
         testRoleObjectMatrix[0][19] = "D2";
-        assertEquals(roleObjectMatrix, testRoleObjectMatrix);
+        assertEquals(testRoleObjectMatrix, roleObjectMatrix);
     }
 
 

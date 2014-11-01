@@ -79,7 +79,7 @@ public class Readers {
     protected static Map<String, Set<String>> readResourceObjectsFile(File file) {
         //Build empty map to fill in logic below
         Map<String, Set<String>> objectsMap =
-                new TreeMap<String, Set<String>>();
+                new HashMap<String, Set<String>>();
         String f = "File", p = "Process", d = "Disk";
         objectsMap.put(f, new LinkedHashSet<String>());
         objectsMap.put(p, new LinkedHashSet<String>());
