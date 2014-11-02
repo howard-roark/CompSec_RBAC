@@ -76,6 +76,7 @@ public class Readers {
                     Readers.readPermissionsFile(file);
                 }
             }
+            br.close();
         } catch (IOException ioe) {
             HW4.p("Error reading input from user: " + ioe);
         }
@@ -198,11 +199,42 @@ public class Readers {
                 }
                 lineNum++;
             }
+            /*Close the stream and reader */
+            fileInputStream.close();
+            bufferedReader.close();
         } catch (IOException ioe) {
             System.err.println("Error reading permissions file: " + ioe);
             System.exit(1);
         }
         return permissionMap;
+    }
+
+    protected static Map<String, List<String>> readRoleSets(File file) {
+        Map<String, List<String>> roleSets = new HashMap<String, List<String>>();
+        try {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            BufferedReader bufferedReader = new BufferedReader(new
+                    InputStreamReader(fileInputStream));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] lineByParts = line.split("\\s+");
+                List<String> roles = new ArrayList<String>();
+                for (int i = 1; i < lineByParts.length; i++) {
+                    roles.add(lineByParts[i]);
+                }
+                if (roleSets.containsKey(lineByParts[0])) {
+                    lineByParts[0] = lineByParts[0] + "A";
+                }
+                roleSets.put(lineByParts[0], roles);
+            }
+            /*Close the stream and reader */
+            fileInputStream.close();
+            bufferedReader.close();
+        } catch (IOException ioe) {
+            System.err.println("Problem reading roleSetsSSD file" + ioe);
+            System.exit(1);
+        }
+        return roleSets;
     }
 
     /**

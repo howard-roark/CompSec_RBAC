@@ -148,17 +148,45 @@ public class HW4 {
         }
     }
 
+    protected List<String> buildDescendantList(String role,
+                                               Map<String, List<String>> roles) {
+        List<String> descendants = new ArrayList<String>();
+        List<String> reverseKeys = new ArrayList<String>(roles.keySet());
+        Collections.reverse(reverseKeys);
+        for (String key : reverseKeys) {
+            if (roles.get(key).contains(role)) {
+                descendants.add(key);
+                role = key;
+            }
+        }
+        return descendants;
+    }
+
     /**
      * Grant control rights to
      * @param accessMatrix
      */
-    protected void grantControlRights(String[][] accessMatrix) {
+    protected void grantControlAndOwnRights(String[][] accessMatrix,
+                                            Map<String, List<String>> roles) {
+        String control = AccessRights.CONTROL.getAccessRightValue();
+        String owner = AccessRights.OWNER.getAccessRightValue();
+
         //Grant all roles to control themselves
-        for (int i = 1; i < accessMatrix.length; i++) {
-            for (int j = 1; j < accessMatrix[0].length; j++) {
+        for (int i = 1; i < accessMatrix.length; i++) {//Iterate rows
+            for (int j = 1; j < accessMatrix[0].length; j++) {//Iterate columns
                 if (accessMatrix[i][0].equals(accessMatrix[0][j])) {
-                    accessMatrix[i][j] =
-                            AccessRights.CONTROL.getAccessRightValue();
+                    accessMatrix = addRight(accessMatrix, i, j, control);
+
+                    List<String> descendants = buildDescendantList(
+                            accessMatrix[i][0], roles);
+                    for (String desc : descendants) {
+                        for (int k = 1; k < accessMatrix.length; k++) {
+                            if (accessMatrix[k][0].equals(desc)) {
+                                accessMatrix = addRight(accessMatrix, k, j,
+                                        new String[]{control, owner});
+                            }
+                        }
+                    }
                     break;
                 }
             }
@@ -175,12 +203,78 @@ public class HW4 {
     protected void grantPermissions(Map<String, List<String>> roles,
                                     String[][] accessMatrix,
                                     File permissions) {
-        grantControlRights(accessMatrix);
+        grantControlAndOwnRights(accessMatrix, roles);
+
         //Put permissions from file into data structure to manage more easily.
         Map<String, Map<String, List<String>>> permissionMap =
                 Readers.readPermissionsFile(permissions);
-
+        for (String role : permissionMap.keySet()) {
+            for (int i = 1; i < accessMatrix.length; i++) {
+                if (accessMatrix[i][0].equals(role)) {
+                    Map<String, List<String>> objectsRights =
+                            permissionMap.get(role);
+                    for (String obj : objectsRights.keySet()) {
+                        for (int j = 1; j < accessMatrix[0].length; j++) {
+                            if (accessMatrix[0][j].equals(obj)) {
+                                for (String right : objectsRights.get(obj)) {
+                                    accessMatrix =
+                                            addRight(accessMatrix,i, j, right);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
+
+    protected void showConstraints(Map<String, List<String>> roleConstraints) {
+        int count = 1;
+        for (String cons : roleConstraints.keySet()) {
+            List<String> roles = roleConstraints.get(cons);
+            cons = Readers.getTextByPattern("([0-9]+)", cons);
+            String printRoles = "";
+            for (String role : roles) {
+                printRoles = printRoles + role + ", ";
+            }
+            printRoles = printRoles.substring(0, printRoles.length() - 2);
+            pLn("Constraint " + count + ", n = " + cons + ", set of roles = {"
+                    + printRoles + "}");
+            count++;
+        }
+    }
+
+    /**
+     * Add Rights to the access matrix.
+     *
+     * @param aMatrix
+     * @param row
+     * @param col
+     * @param rights
+     * @return
+     */
+    protected String[][] addRight(String[][] aMatrix, int row, int col,
+                                  String... rights) {
+        for (String right : rights) {
+            if ((aMatrix[row][col] != null) &&
+                    (!aMatrix[row][col].contains(right))) {
+                String existingRight = aMatrix[row][col];
+                String newRight;
+                if ((existingRight.equals("")) || (existingRight == null)) {
+                    newRight = right;
+                } else {
+                    newRight = existingRight + "," +
+                            right;
+                }
+                aMatrix[row][col] = newRight;
+            } else if (aMatrix[row][col] == null) {
+                aMatrix[row][col] = right;
+            }
+        }
+        return aMatrix;
+    }
+
+
 
     /**
      * Method to avoid using System.out for every call to print to console.
@@ -204,6 +298,8 @@ public class HW4 {
                 "/Files/resourceObjects.txt");
         File permissionsFile = new File(workingDirectory +
                 "/Files/permissionsToRoles.txt");
+        File rolesSSD = new File(workingDirectory +
+                "/Files/roleSetsSSD.txt");
 
         pLn("Problem 2:\n");
         hw4.printRoleMap(hw4.readRoleHierarchy(roleFile));
@@ -214,11 +310,14 @@ public class HW4 {
                         hw4.readRoleHierarchy(roleFile),
                         hw4.readResourceObjects(objectFile)));
 
-        pLn("\nProblem 4:\n");
+        pLn("\nProblem 4:\nMATRIX IS POPULATED PROPERLY BUT NOT PRINTING TO CONSOLE");
         hw4.grantPermissions(hw4.readRoleHierarchy(roleFile),
                 hw4.buildRoleObjectMatrix(
                         hw4.readRoleHierarchy(roleFile),
                         hw4.readResourceObjects(objectFile)),
                         permissionsFile);
+
+        pLn("\nProblem 5:\n");
+        hw4.showConstraints(Readers.readRoleSets(rolesSSD));
     }
 }

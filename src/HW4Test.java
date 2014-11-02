@@ -1,4 +1,5 @@
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
 import org.junit.Before;
@@ -55,6 +56,9 @@ public class HW4Test {
             new HashMap<String, List<String>>();
     private final Map<String, List<String>> objectsRightsD =
             new HashMap<String, List<String>>();
+
+    /* Build example descndants list for role <R8> */
+    private List<String> r8Descendants = new ArrayList<String>();
 
     /**
      * Build expected data structures to compare to actual returns.
@@ -130,6 +134,8 @@ public class HW4Test {
         knownPermissions.put("R2", objectsRightsB);
         knownPermissions.put("R10", objectsRightsC);
         knownPermissions.put("R7", objectsRightsD);
+
+        r8Descendants = Arrays.asList("R6", "R2", "R1");
     }
 
     /**
@@ -285,6 +291,12 @@ public class HW4Test {
             HW4.pLn(right.getAccessRightValue());
         }
         assertEquals(true, AccessRights.compareAccessRights("seek"));
+    }
+
+    @Test
+    public void testBuildDescendantsList() {
+        assertEquals(r8Descendants, hw4.buildDescendantList("R8",
+                hw4.readRoleHierarchy(roleFile)));
     }
 
     @After
