@@ -17,7 +17,7 @@ public class HW4Test {
     String workingDirectory;
 
     /* File for resource objects */
-    File objsFile;
+    private File objsFile;
 
     /*HW4 instance to test */
     HW4 hw4 = new HW4();
@@ -43,14 +43,27 @@ public class HW4Test {
     private final String PROCESS = "Process";
     private final String DISK = "Disk";
 
+    /* Map to test permission map with */
+    private File permissionsFile;
+    private final Map<String, Map<String, List<String>>> knownPermissions =
+            new HashMap<String, Map<String, List<String>>>();
+    private final Map<String, List<String>> objectsRightsA =
+            new HashMap<String, List<String>>();
+    private final Map<String, List<String>> objectsRightsB =
+            new HashMap<String, List<String>>();
+    private final Map<String, List<String>> objectsRightsC =
+            new HashMap<String, List<String>>();
+    private final Map<String, List<String>> objectsRightsD =
+            new HashMap<String, List<String>>();
+
     /**
      * Build expected data structures to compare to actual returns.
      */
     @Before
     public void setUp() {
-        workingDirectory = System.getProperty("user.dir") + "/src/";
-        roleFile = new File(workingDirectory + "Files/roleHierarchy.txt");
-        objsFile = new File(workingDirectory + "Files/resourceObjects.txt");
+        workingDirectory = System.getProperty("user.dir");
+        roleFile = new File(workingDirectory + "/Files/roleHierarchy.txt");
+        objsFile = new File(workingDirectory + "/Files/resourceObjects.txt");
         lines.push("R8");
         lines.push("R6");
         lines.push("R9");
@@ -97,6 +110,26 @@ public class HW4Test {
         objectsSetD.add("D1");
         objectsSetD.add("D2");
         objectsMap.put("Disk", objectsSetD);
+
+        //Build known permissions map
+        permissionsFile =
+                new File(workingDirectory + "/Files/permissionsToRoles.txt");
+        objectsRightsA.put("F3",
+                Arrays.asList(new String[]
+                        {AccessRights.WRITE_WITH_COPY.getAccessRightValue()}));
+        objectsRightsB.put("D1",
+                Arrays.asList(new String[]
+                        {AccessRights.SEEK.getAccessRightValue()}));
+        objectsRightsC.put("P1",
+                Arrays.asList(new String[]
+                        {AccessRights.STOP.getAccessRightValue()}));
+        objectsRightsD.put("D2",
+                Arrays.asList(new String[]
+                        {AccessRights.SEEK_WITH_COPY.getAccessRightValue()}));
+        knownPermissions.put("R6", objectsRightsA);
+        knownPermissions.put("R2", objectsRightsB);
+        knownPermissions.put("R10", objectsRightsC);
+        knownPermissions.put("R7", objectsRightsD);
     }
 
     /**
@@ -240,6 +273,11 @@ public class HW4Test {
         assertEquals(testRoleObjectMatrix, roleObjectMatrix);
     }
 
+    @Test
+    public void testReadPermissionFile() {
+        assertEquals(knownPermissions,
+                Readers.readPermissionsFile(permissionsFile));
+    }
 
     @Test
     public void testAccessRightsCompareMethod() {

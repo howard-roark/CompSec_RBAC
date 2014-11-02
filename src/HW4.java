@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.Reader;
 import java.util.*;
 
 /**
@@ -175,6 +176,9 @@ public class HW4 {
                                     String[][] accessMatrix,
                                     File permissions) {
         grantControlRights(accessMatrix);
+        //Put permissions from file into data structure to manage more easily.
+        Map<String, Map<String, List<String>>> permissionMap =
+                Readers.readPermissionsFile(permissions);
 
     }
 

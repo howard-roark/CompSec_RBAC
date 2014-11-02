@@ -23,7 +23,7 @@ public class Readers {
             BufferedReader bufferedReader = new BufferedReader(new
                     InputStreamReader(fileInputStream));
             String line = "";
-            int lineNum = 0;
+            int lineNum = 1;
             while ((line = bufferedReader.readLine()) != null) {
                 if (matches("^[Rr][0-9]+{1}[\\s]+[Rr][0-9]+{1}", line)) {
                     /* Split the line into two roles so that they can be added
@@ -64,18 +64,29 @@ public class Readers {
      */
     private static void promptUserFixLine(int lineNum, File file) {
         System.out.println("There was an error with line number " + lineNum +
-                ".  Please fix your file and Press any key to continue...");
+                " in the " + file.getName() + "file.  " +
+                "Please fix your file and Press any key to continue...");
         try {
             BufferedReader br = new BufferedReader(new
                     InputStreamReader(System.in));
             if (br.readLine() != null) {
-                Readers.readRoleHierarchyFile(file);
+                if (file.getName().equals("roleHierarchy.txt")) {
+                    Readers.readRoleHierarchyFile(file);
+                } else if (file.getName().equals("permissionsToRoles.txt")) {
+                    Readers.readPermissionsFile(file);
+                }
             }
         } catch (IOException ioe) {
             HW4.p("Error reading input from user: " + ioe);
         }
     }
 
+    /**
+     * Build resource object map.
+     *
+     * @param file
+     * @return
+     */
     protected static Map<String, Set<String>> readResourceObjectsFile(File file) {
         //Build empty map to fill in logic below
         Map<String, Set<String>> objectsMap =
@@ -130,6 +141,68 @@ public class Readers {
             System.exit(1);
         }
         return objectsMap;
+    }
+
+    /**
+     * Build map to place permissions into access matrix being built in HW4.
+     *
+     * @param file
+     * @return
+     */
+    protected static Map<String, Map<String, List<String>>> readPermissionsFile(
+            File file) {
+        Map<String, Map<String, List<String>>> permissionMap =
+                new HashMap<String, Map<String, List<String>>>();
+        try {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            BufferedReader bufferedReader = new BufferedReader(new
+                    InputStreamReader(fileInputStream));
+
+            String line;
+            int lineNum = 1;
+            Map<String, List<String>> objectsRights;
+            List<String> rights;
+            while ((line = bufferedReader.readLine()) != null) {
+                String role = "", right = "", object = "";
+                if (matches("^[Rr][0-9]+[\\s]+[a-z*]+[\\s]+[FPD][0-9]+",
+                        line)) {
+                    String[] lineByParts = line.split("\\s+");
+                    if (lineByParts.length == 3) {
+                        role = lineByParts[0];
+                        right = lineByParts[1];
+                        object = lineByParts[2];
+
+                        if (permissionMap.containsKey(role)) {
+                            objectsRights =
+                                    permissionMap.get(role);
+                            if (objectsRights.containsKey(object)) {
+                                rights = objectsRights.get(object);
+                            } else {//Add new object as key for the rights list
+                                rights = new ArrayList<String>();
+                                rights.add(right);
+                            }
+                            rights.add(right);
+                            objectsRights.put(object, rights);
+                        } else {//New role being added to map
+                            rights = new ArrayList<String>();
+                            rights.add(right);
+                            objectsRights = new HashMap<String, List<String>>();
+                            objectsRights.put(object, rights);
+                            permissionMap.put(role, objectsRights);
+                        }
+                    } else {
+                        promptUserFixLine(lineNum, file);
+                    }
+                } else {
+                    promptUserFixLine(lineNum, file);
+                }
+                lineNum++;
+            }
+        } catch (IOException ioe) {
+            System.err.println("Error reading permissions file: " + ioe);
+            System.exit(1);
+        }
+        return permissionMap;
     }
 
     /**
