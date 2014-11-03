@@ -19,6 +19,7 @@ public class HW4Test {
 
     /* File for resource objects */
     private File objsFile;
+    private File usersToRoles;
 
     /*HW4 instance to test */
     HW4 hw4 = new HW4();
@@ -60,6 +61,10 @@ public class HW4Test {
     /* Build example descndants list for role <R8> */
     private List<String> r8Descendants = new ArrayList<String>();
 
+    /* Test users to roles map */
+    Map<String, List<String>> testUsersToRoles =
+            new HashMap<String, List<String>>();
+
     /**
      * Build expected data structures to compare to actual returns.
      */
@@ -68,6 +73,7 @@ public class HW4Test {
         workingDirectory = System.getProperty("user.dir");
         roleFile = new File(workingDirectory + "/Files/roleHierarchy.txt");
         objsFile = new File(workingDirectory + "/Files/resourceObjects.txt");
+        usersToRoles = new File(workingDirectory + "/Files/usersRoles.txt");
         lines.push("R8");
         lines.push("R6");
         lines.push("R9");
@@ -136,6 +142,13 @@ public class HW4Test {
         knownPermissions.put("R7", objectsRightsD);
 
         r8Descendants = Arrays.asList("R6", "R2", "R1");
+
+        testUsersToRoles.put("U1",
+                Arrays.asList(new String[]{"R1", "R6", "R10", "R8", "R5"}));
+        testUsersToRoles.put("U2",
+                Arrays.asList(new String[]{"R4", "R9", "R5", "R10", "R8"}));
+        testUsersToRoles.put("U3",
+                Arrays.asList(new String[]{"R6", "R7", "R9", "R4", "R10", "R4", "R5", "R8"}));
     }
 
     /**
@@ -297,6 +310,12 @@ public class HW4Test {
     public void testBuildDescendantsList() {
         assertEquals(r8Descendants, hw4.buildDescendantList("R8",
                 hw4.readRoleHierarchy(roleFile)));
+    }
+
+    @Test
+    public void testReadUsersToRoles() {
+        assertEquals(testUsersToRoles,
+                Readers.readUsersToRoles(usersToRoles));
     }
 
     @After

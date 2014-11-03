@@ -275,6 +275,9 @@ public class HW4 {
     }
 
 
+    protected void showUserToRoles(Map<String, List<String>> userRoleMap) {
+
+    }
 
     /**
      * Method to avoid using System.out for every call to print to console.
@@ -300,6 +303,8 @@ public class HW4 {
                 "/Files/permissionsToRoles.txt");
         File rolesSSD = new File(workingDirectory +
                 "/Files/roleSetsSSD.txt");
+        File usersToRoles = new File(workingDirectory +
+                "/Files/usersRoles.txt");
 
         pLn("Problem 2:\n");
         hw4.printRoleMap(hw4.readRoleHierarchy(roleFile));
@@ -319,5 +324,8 @@ public class HW4 {
 
         pLn("\nProblem 5:\n");
         hw4.showConstraints(Readers.readRoleSets(rolesSSD));
+
+        pLn("\nProblem 6:\n");
+        hw4.showUserToRoles(Readers.readUsersToRoles(usersToRoles));
     }
 }

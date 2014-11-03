@@ -59,7 +59,7 @@ public class Readers {
      * readFile method.
      *
      * @param lineNum with error in file
-     * @param file file being read from
+     * @param file    file being read from
      * @throws Exception for calling readFile when twoRoles array is mal-formed
      */
     private static void promptUserFixLine(int lineNum, File file) {
@@ -74,6 +74,8 @@ public class Readers {
                     Readers.readRoleHierarchyFile(file);
                 } else if (file.getName().equals("permissionsToRoles.txt")) {
                     Readers.readPermissionsFile(file);
+                } else if (file.getName().equals("usersRoles.txt")) {
+                    Readers.readUsersToRoles(file);
                 }
             }
             br.close();
@@ -192,9 +194,15 @@ public class Readers {
                             permissionMap.put(role, objectsRights);
                         }
                     } else {
+                        /*Close the stream and reader */
+                        fileInputStream.close();
+                        bufferedReader.close();
                         promptUserFixLine(lineNum, file);
                     }
                 } else {
+                    /*Close the stream and reader */
+                    fileInputStream.close();
+                    bufferedReader.close();
                     promptUserFixLine(lineNum, file);
                 }
                 lineNum++;
@@ -237,6 +245,50 @@ public class Readers {
         return roleSets;
     }
 
+
+    protected static Map<String, List<String>> readUsersToRoles(File file) {
+        Map<String, List<String>> userRolesMap =
+                new HashMap<String, List<String>>();
+        try {
+            FileInputStream fileInputStream = new FileInputStream(file);
+            BufferedReader bufferedReader = new BufferedReader(new
+                    InputStreamReader(fileInputStream));
+            String line;
+            int lineNum = 1;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] lineByParts = line.split("\\s+");
+                if (!lineByParts[0].matches("^[Uu][0-9]+")) {
+                    /*Close the stream and reader */
+                    fileInputStream.close();
+                    bufferedReader.close();
+                    promptUserFixLine(lineNum, file);
+                    break;
+                }
+
+                List<String> roles = new ArrayList<String>();
+                for (int i = 1; i < lineByParts.length; i++) {
+                    if (!lineByParts[i].matches("[Rr][0-9]+")) {
+                        /*Close the stream and reader */
+                        fileInputStream.close();
+                        bufferedReader.close();
+                        promptUserFixLine(lineNum, file);
+                        break;
+                    } else {
+                        roles.add(lineByParts[i]);
+                    }
+                }
+                userRolesMap.put(lineByParts[0], roles);
+            }
+            /*Close the stream and reader */
+            fileInputStream.close();
+            bufferedReader.close();
+        } catch (IOException ioe) {
+            System.err.println("Problem reading usersRoles file" + ioe);
+            System.exit(1);
+        }
+        return userRolesMap;
+    }
+
     /**
      * Will determine if the line in the file is valid to be used in the HW4
      * class.
@@ -250,7 +302,8 @@ public class Readers {
         return p.matches(regex, line);
     }
 
-    /** Return a string based on the regex and string passed in.
+    /**
+     * Return a string based on the regex and string passed in.
      *
      * @param regex
      * @param string
