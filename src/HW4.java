@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.Reader;
 import java.util.*;
 
 /**
@@ -275,8 +274,47 @@ public class HW4 {
     }
 
 
-    protected void showUserToRoles(Map<String, List<String>> userRoleMap) {
+    /**
+     * Show users to roles map based on constraints from problem 5 and user to
+     * roles file.
+     *
+     * @param userRoleMap
+     * @param constraintsMap
+     */
+    protected Map<String, List<String>> showUserToRoles(Map<String, List<String>> userRoleMap,
+                                   Map<String, List<String>> constraintsMap) {
+        Map<String, List<String>> usersAllowedRoles =
+                new HashMap<String, List<String>>();
+        List<String> alLConstrainedRoles = new LinkedList<String>();
+        for (String key : constraintsMap.keySet()) {
+            List<String> constrainedRoles = constraintsMap.get(key);
+            int rolesAllowed = Integer.parseInt(Readers.getTextByPattern("([0-9]+", key));
+            for (String role : constrainedRoles) {
+                for (int i = 0; i < rolesAllowed; i++) {
+                    alLConstrainedRoles.add(role);
+                }
+            }
+        }
 
+        Set<String> checkForRestraints = new HashSet<String>(alLConstrainedRoles);
+        for (String userKey : userRoleMap.keySet()) {
+            usersAllowedRoles.put(userKey, new ArrayList<String>());
+            List<String> requestedRoles = userRoleMap.get(userKey);
+            for (String reqRole : requestedRoles) {
+                if (checkForRestraints.contains(reqRole)) {
+                    if (alLConstrainedRoles.contains(reqRole)) {
+                        List<String> roles = usersAllowedRoles.get(userKey);
+                        roles.add(reqRole);
+                        usersAllowedRoles.put(userKey, roles);
+                    }
+                } else {
+                    List<String> roles = usersAllowedRoles.get(userKey);
+                    roles.add(reqRole);
+                    usersAllowedRoles.put(userKey, roles);
+                }
+            }
+        }
+        return usersAllowedRoles;
     }
 
     /**
@@ -284,10 +322,7 @@ public class HW4 {
      *
      * @param item The token that was found
      */
-    protected static void pLn(Object item) {
-        System.out.println(item);
-    }
-
+    protected static void pLn(Object item) { System.out.println(item); }
     protected static void p(Object item) {
         System.out.print(item);
     }
@@ -325,7 +360,10 @@ public class HW4 {
         pLn("\nProblem 5:\n");
         hw4.showConstraints(Readers.readRoleSets(rolesSSD));
 
-        pLn("\nProblem 6:\n");
-        hw4.showUserToRoles(Readers.readUsersToRoles(usersToRoles));
+        pLn("\nProblem 6:\nUSERS AND ALLOWABLE ROLES BUILT BUT NOT PRINTING");
+        hw4.showUserToRoles(Readers.readUsersToRoles(usersToRoles),
+                Readers.readRoleSets(rolesSSD));
+
+        pLn("\nProblem 7:\nNot Attempted.  Ran out of time.");
     }
 }
